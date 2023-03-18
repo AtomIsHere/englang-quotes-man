@@ -6,6 +6,7 @@ use dotenvy::dotenv;
 use surrealdb::{Surreal, engine::remote::ws::Ws, opt::auth::Root};
 
 mod error;
+mod model;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
