@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
-enum Subsystem {
+pub enum Subsystem {
     Phonetics,
     Phonology,
     Morphology,
@@ -19,13 +19,13 @@ pub struct Concept {
 #[derive(Serialize, Deserialize)]
 pub struct Quote {
     #[serde(skip_serializing)]
-    id: Option<String>,
+    pub id: Option<String>,
 
-    context: String,
-    source: String,
-    quote: String,
-    description: String,
+    pub context: String,
+    pub source: String,
+    pub quote: String,
+    pub description: String,
     
-    subsystems: Vec<Subsystem>,
-    concepts: Vec<Concept>,
+    pub subsystems: Vec<Subsystem>,
+    pub concepts: Vec<Concept>,
 }

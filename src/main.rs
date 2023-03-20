@@ -1,12 +1,15 @@
 use std::{net::SocketAddr, env};
 
-use axum::{routing::get, Router};
+use axum::{routing::{get, post}, Router};
 use dotenvy::dotenv;
 
 use surrealdb::{Surreal, engine::remote::ws::Ws, opt::auth::Root};
 
+use crate::model::*;
+
 mod error;
 mod model;
+mod quote;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,6 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db = Surreal::new::<Ws>(env::var("DB_CONNECTION")
         .expect("DB_CONNECTION enviroment variable not present"))
         .await?;
+ 
 
     db.signin(Root {
         username: &env::var("DB_USERNAME").expect("DB_USERNAME enviroment variable not present"),
@@ -25,13 +29,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     db.use_ns(env::var("DB_NAMESPACE").expect("DB_NAMESPACE enviroment variable not present"))
         .use_db(env::var("DB_DATABASE").expect("DB_DATABASE enviroment variable not present"))
         .await?;
-
+    
     let app = Router::new()
         .route("/", get(root))
+        .route("/quote/create", post(quote::create))
+        .route("/quotes", get(quote::list))
         .with_state(db);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     tracing::debug!("Listening on {}", addr);
+
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await?;
