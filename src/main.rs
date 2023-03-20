@@ -5,8 +5,6 @@ use dotenvy::dotenv;
 
 use surrealdb::{Surreal, engine::remote::ws::Ws, opt::auth::Root};
 
-use crate::model::*;
-
 mod error;
 mod model;
 mod quote;

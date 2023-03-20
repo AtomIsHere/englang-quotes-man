@@ -1,7 +1,7 @@
 use axum::{extract::{State, Path}, Json};
 use surrealdb::{Surreal, engine::remote::ws::Client};
 
-use crate::{model::Quote, error::Error};
+use crate::{model::{Quote, QuoteResponse}, error::Error};
 
 const QUOTE: &str = "quote";
 
@@ -15,7 +15,11 @@ pub async fn create(
     Ok(Json(quote))
 }
 
-pub async fn list(db: Db) -> Result<Json<Vec<Quote>>, Error> {
-    let quote = db.select(QUOTE).await?;
-    Ok(Json(quote))
+pub async fn list(db: Db) -> Result<Json<Vec<QuoteResponse>>, Error> {
+    let quotes: Vec<Quote> = db.select(QUOTE).await?;
+
+    Ok(Json(quotes.iter().map(|q| QuoteResponse { id: match q.id.clone() {
+        Some(s) => s,
+        None => "NOT_PRESENT".to_string(),
+    }, quote: q.clone() }).collect()))
 }
